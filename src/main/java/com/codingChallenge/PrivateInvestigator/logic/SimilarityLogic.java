@@ -1,14 +1,16 @@
 package com.codingChallenge.PrivateInvestigator.logic;
 
 import com.codingChallenge.PrivateInvestigator.obj.SimilarGroup;
+
 import java.util.*;
 
 public class SimilarityLogic {
 
     private static final int TIMESTAMP_INDEX = 20;
 
-    /** Iterates over the input lines and finds and groups similar lines. Also collects the changing words
-     *
+    /**
+     * Iterates over the input lines and finds and groups similar lines. Also collects the changing words.
+     * Two strings are considered similar if exactly one word differs between them.
      * @param lines input lines
      * @return a Map in which key is the common pattern and value is a SimilarGroup object,
      * which holds the line numbers of the corresponding lines.
@@ -17,17 +19,23 @@ public class SimilarityLogic {
         final int size = lines.size();
         Map<String, SimilarGroup> similarGroupMap = new HashMap<>();
 
+        // convert lines into arrays of words, so that don't have to tokenize the lines inside the nested for loop.
+        List<String[]> arraysOfWords = new ArrayList<>();
+        for (String line : lines) {
+            String[] words = removeTimeStampPrefix(line).split(" ");
+            arraysOfWords.add(words);
+        }
+
         for (int i = 0; i < size; i++) {
-            String si = removeTimeStampPrefix(lines.get(i));
+            String[] iArray = arraysOfWords.get(i);
 
-            for (int j = i+1; j < size; j++) {
-                String sj = removeTimeStampPrefix(lines.get(j));
-                StringTokenizer sti = new StringTokenizer(si, " ");
-                StringTokenizer stj = new StringTokenizer(sj, " ");
+            for (int j = i + 1; j < size; j++) {
+                String[] jArray = arraysOfWords.get(j);
 
-                List<String> changingWords = findChangingWordsIfSimilar(sti, stj);
+                List<String> changingWords = findChangingWordsIfSimilar(iArray, jArray);
                 if (!changingWords.isEmpty()) {
 
+                    String si = removeTimeStampPrefix(lines.get(i));
                     String pattern = si.replace(changingWords.get(0), "*");
                     SimilarGroup sg = similarGroupMap.get(pattern);
                     if (sg == null) {
@@ -43,22 +51,24 @@ public class SimilarityLogic {
         return similarGroupMap;
     }
 
-    /** Two strings are considered similar if exactly one word differs between them.
-     *  This method compares two strings and returns the two differing words if and only if the strings are similar.
-     *  Returns empty list if the two strings are not similar.
+    /**
+     * Two strings are considered similar if exactly one word differs between them.
+     * This method compares two strings and returns the two differing words if and only if the strings are similar.
+     * Returns empty list if the two strings are not similar.
      *
-     * @param sti the tokenized string.
-     * @param stj the other tokenized string.
-     * @return changing words as a list, if the two strings are similar (exactly one word is different)
+     * @param iArray a sentence as an array of words.
+     * @param jArray another sentence as an array of words.
+     * @return changing words as a list of size 2 if the two strings are similar (exactly one word is different),
+     * or an empty list if the two strings are not similar.
      */
-    private static List<String> findChangingWordsIfSimilar(StringTokenizer sti, StringTokenizer stj) {
+    private static List<String> findChangingWordsIfSimilar(String[] iArray, String[] jArray) {
         List<String> changingWords = new ArrayList<>();
         boolean diffFound = false;
         // if word counts doesn't match, they are not similar
-        if (sti.countTokens() == stj.countTokens()) {
-            while (sti.hasMoreTokens()) {
-                String iToken = sti.nextToken();
-                String jToken = stj.nextToken();
+        if (iArray.length == jArray.length) {
+            for (int i = 0; i < iArray.length; i++) {
+                String iToken = iArray[i];
+                String jToken = jArray[i];
                 if (!iToken.equals(jToken)) {
                     if (diffFound) {
                         // more than one difference means not similar.
