@@ -9,22 +9,43 @@ public class SimilarityLogic {
     private static final int TIMESTAMP_INDEX = 20;
 
     /**
+     * Since people follow routines, it is logical to assume that the same event happens repeatedly.
+     * This method finds repeated occurrences of the same event happening at different timestamps and maps it with
+     * corresponding indexes in the given list of lines. This gives us a collection of unique strings to compare.
+     * This helps us reduce the number of iterations we will have to do later.
+     * @param lines the input data as a list of lines
+     * @return map of unique strings and corresponding indexes in the given list of lines.
+     */
+    public static Map<String, List<Integer>> sameEventIndexesMap(List<String> lines) {
+        Map<String, List<Integer>> sameEventIndexesMap = new HashMap<>();
+
+        if (lines != null) {
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                String s = removeTimeStampPrefix(line);
+                List<Integer> indexes = sameEventIndexesMap.computeIfAbsent(s, k -> new ArrayList<>());
+                indexes.add(i);
+            }
+        }
+        return sameEventIndexesMap;
+    }
+
+    /**
      * Iterates over the input lines and finds and groups similar lines. Also collects the changing words.
      * Two strings are considered similar if exactly one word differs between them.
-     * @param lines input lines
+     *
+     * @param sameEventIndexesMap map of unique events and corresponding indexes in the original list of lines
      * @return a Map in which key is the common pattern and value is a SimilarGroup object,
      * which holds the line numbers of the corresponding lines.
      */
-    public static Map<String, SimilarGroup> findSimilar(List<String> lines) {
-        final int size = lines.size();
-        Map<String, SimilarGroup> similarGroupMap = new HashMap<>();
+    public static Map<String, SimilarGroup> findSimilar(Map<String, List<Integer>> sameEventIndexesMap) {
 
-        // convert lines into arrays of words, so that don't have to tokenize the lines inside the nested for loop.
-        List<String[]> arraysOfWords = new ArrayList<>();
-        for (String line : lines) {
-            String[] words = removeTimeStampPrefix(line).split(" ");
-            arraysOfWords.add(words);
-        }
+        Map<String, SimilarGroup> similarGroupMap = new HashMap<>();
+        List<String> uniqueLines = new ArrayList<>(sameEventIndexesMap.keySet());
+        final int size = uniqueLines.size();
+
+        // convert lines into arrays of words, so that we don't have to tokenize the lines inside the nested for loop.
+        List<String[]> arraysOfWords = uniqueLines.stream().map(line -> line.split(" ")).toList();
 
         for (int i = 0; i < size; i++) {
             String[] iArray = arraysOfWords.get(i);
@@ -35,15 +56,16 @@ public class SimilarityLogic {
                 List<String> changingWords = findChangingWordsIfSimilar(iArray, jArray);
                 if (!changingWords.isEmpty()) {
 
-                    String si = removeTimeStampPrefix(lines.get(i));
+                    String si = uniqueLines.get(i);
+                    String sj = uniqueLines.get(j);
                     String pattern = si.replace(changingWords.get(0), "*");
                     SimilarGroup sg = similarGroupMap.get(pattern);
                     if (sg == null) {
                         sg = new SimilarGroup();
                         similarGroupMap.put(pattern, sg);
                     }
-                    sg.getLineNumbers().add(i);
-                    sg.getLineNumbers().add(j);
+                    sg.getLineNumbers().addAll(sameEventIndexesMap.get(si));
+                    sg.getLineNumbers().addAll(sameEventIndexesMap.get(sj));
                     sg.getChangingWords().addAll(changingWords);
                 }
             }

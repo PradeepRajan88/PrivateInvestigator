@@ -4,7 +4,6 @@ import com.codingChallenge.PrivateInvestigator.logic.SimilarityLogic;
 import com.codingChallenge.PrivateInvestigator.obj.SimilarGroup;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,10 +16,13 @@ public class Main {
     public static void main(String[] args) {
 
         try {
+            long t1 = System.currentTimeMillis();
             List<String> lines = readInputFile();
-            Map<String, SimilarGroup> similarGroupMap = SimilarityLogic.findSimilar(lines);
+            Map<String, List<Integer>> sameEventIndexesMap = SimilarityLogic.sameEventIndexesMap(lines);
+            Map<String, SimilarGroup> similarGroupMap = SimilarityLogic.findSimilar(sameEventIndexesMap);
             List<String> outputLines = SimilarityLogic.generateOutputLines(similarGroupMap, lines);
             writeOutputFile(outputLines);
+            System.out.println("execution time ms "+(System.currentTimeMillis() - t1));
         } catch (IOException e) {
             e.printStackTrace();
         }
