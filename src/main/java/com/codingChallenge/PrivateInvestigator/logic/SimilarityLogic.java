@@ -5,7 +5,7 @@ import java.util.*;
 
 public class SimilarityLogic {
 
-    private static final int TIMESTAMP_INDEX = 19;
+    private static final int TIMESTAMP_INDEX = 20;
 
     /** Iterates over the input lines and finds and groups similar lines. Also collects the changing words
      *
@@ -20,13 +20,13 @@ public class SimilarityLogic {
         for (int i = 0; i < size; i++) {
             String si = removeTimeStampPrefix(lines.get(i));
 
-            for (int j = i; j < size; j++) {
+            for (int j = i+1; j < size; j++) {
                 String sj = removeTimeStampPrefix(lines.get(j));
                 StringTokenizer sti = new StringTokenizer(si, " ");
                 StringTokenizer stj = new StringTokenizer(sj, " ");
 
                 List<String> changingWords = findChangingWordsIfSimilar(sti, stj);
-                if (changingWords != null && !changingWords.isEmpty()) {
+                if (!changingWords.isEmpty()) {
 
                     String pattern = si.replace(changingWords.get(0), "*");
                     SimilarGroup sg = similarGroupMap.get(pattern);
@@ -83,11 +83,9 @@ public class SimilarityLogic {
     public static List<String> generateOutputLines(Map<String, SimilarGroup> similarGroupMap, List<String> lines) {
         List<String> outputLines = new ArrayList<>();
         if (similarGroupMap != null && lines != null) {
-            similarGroupMap.entrySet().forEach(entry -> {
-                entry.getValue().getLineNumbers().forEach(integer -> {
-                    outputLines.add(lines.get(integer));
-                });
-                outputLines.add("The changing word was: " + String.join(", ", entry.getValue().getChangingWords()));
+            similarGroupMap.forEach((key, value) -> {
+                value.getLineNumbers().forEach(integer -> outputLines.add(lines.get(integer)));
+                outputLines.add("The changing word was: " + String.join(", ", value.getChangingWords()));
             });
         }
         return outputLines;
