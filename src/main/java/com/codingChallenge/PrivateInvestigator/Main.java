@@ -17,10 +17,10 @@ public class Main {
 
         try {
             long t1 = System.currentTimeMillis();
-            List<String> lines = readInputFile();
-            Map<String, List<Integer>> sameEventIndexesMap = SimilarityLogic.sameEventIndexesMap(lines);
+            List<String> inputLines = readInputFile();
+            Map<String, List<Integer>> sameEventIndexesMap = SimilarityLogic.sameEventIndexesMap(inputLines);
             Map<String, SimilarGroup> similarGroupMap = SimilarityLogic.findSimilar(sameEventIndexesMap);
-            List<String> outputLines = SimilarityLogic.generateOutputLines(similarGroupMap, lines);
+            List<String> outputLines = SimilarityLogic.generateOutputLines(similarGroupMap, inputLines);
             writeOutputFile(outputLines);
             System.out.println("execution time ms "+(System.currentTimeMillis() - t1));
         } catch (IOException e) {
@@ -37,7 +37,6 @@ public class Main {
         return reader.lines().collect(Collectors.toList());
     }
 
-
     static void writeOutputFile(List<String> outputLines) throws IOException {
         FileWriter writer = new FileWriter(OUTPUT_FILE_NAME);
         for (String str : outputLines) {
@@ -46,4 +45,5 @@ public class Main {
         }
         writer.close();
     }
+
 }

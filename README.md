@@ -2,24 +2,31 @@
 
 ## Overview
 
-This is a plain Java solution written and tested with Java 17. Prior versions should word as well, but are not tested.
+This is a plain Java solution written and tested with Java 17. Prior versions should work as well, but are not tested.
 Maven is used to build the project, but there are no dependencies at this time.
 
 ## How to run
 
 Build the source with Maven. Paste your input data in [inputFile.txt](inputFile.txt) in the root directory. Run [Main.java](src%2Fmain%2Fjava%2Fcom%2FcodingChallenge%2FPrivateInvestigator%2FMain.java) as a Java application. output will be written to [outputFile.txt](outputFile.txt) (also printed to the console).
 
+## Order of similar sentence groups
+The requirement does not specify how to order the similar sentence groups in the output. The order of this solution's output is different from the sample given in the requirement, but I am assuming that it is fine, as long as the output is accurate.
+
+## Accuracy
+This solution produced accurate results in my testing with large and small datasets with sentence kind of similar to the given sample. If I had more time, I would test more extreme scenarios.
+
+
 ## Time Complexity
 
-The algorithm compares each unique string with every other unique string with a nested for loop which results in a time complexity of
-O(n * n-1)/2. This is effectively quadratic O(n^2). My intuition is that this cannot be further reduced (unless we make assumptions about the structure of the strings).
+The algorithm compares each unique string with every other unique string with a nested for loop with j = i + 1 which results in a time complexity of
+O(n*(n-1)/2), where n is the number of unique strings. This is effectively quadratic O(n^2). My intuition is that this cannot be reduced further because we have to compare each string with each of the other strings at least once (unless we make assumptions about the structure of the strings).
 
 However, Since people follow routines, it is logical to assume that the same event happens repeatedly. For example, "Naomi is getting into the car" can
 happen again and again at different timestamps. In that case, we only need to consider it once in our comparison algorithm (provided we map the occurrences of that string in the input
-for creating the output data). This optimization is done with the SimilarityLogic.sameEventIndexesMap() method. if we assume that elimination repetitions reduces n to log(n),
+for creating the output data). This optimization is done with the SimilarityLogic.sameEventIndexesMap() method. if we assume that this elimination of repetitions reduces n to log(n),
 our time complexity becomes O(log(n)^2)
 
-inside the nested for loop, the operation is a fail-fast string to string comparison, which can be considered constant time because the length of the strings is limited. We are actually doing a fail-fast word-word comparison, which is faster than character to character comparison because in a typical case we won't need to look at every character, and spaces are removed. 
+inside the nested for loop, the operation is a fail-fast string to string comparison, which can be considered constant time because the length of the strings is limited. We are actually doing a fail-fast word-word comparison, which is faster than a full character-character comparison because in a typical fail case we won't need to look at every character, and spaces are removed. 
 
 ## Space Complexity
 
@@ -37,12 +44,11 @@ Then out comparison algorithm becomes int comparison (i == j) rather than String
 
 ## If I had more time
 
-I would try to optimize further, using the about word-int Map, or if we can assume that the Strings have a fixed structure (for example Name + verb + noun), that's a possibility for optimization. If we can assume that phrases like "is", "at a", "the" follow fixed pattern, we can try to remove them from comparison algorithm.
-Also, there is scope to make the code more modular and more readable.
+I would try to optimize further, using the aforementioned word-int Map. If we can assume that the Strings have a fixed structure (for example Name + verb + noun), that's a possibility for optimization. If we can assume that phrases like "is", "at a", "the" follow fixed pattern, we can try to remove them from comparison algorithm.
 
 It would be good to have unit tests for each function in the logic class.
 
-If I convert this solution into a rest api which accepts the input and returns the output, the solution becomes more usable.
+If I convert this solution into a REST api which accepts the input and returns the output, the solution becomes more usable and testable.
 
 It is worth looking into various String Metrics algorithms, like Levenshtein distance, and their optimisations and dynamic programming approaches. probably we can adapt their character to character comparison into a fail-fast word-to-word comparison.
 

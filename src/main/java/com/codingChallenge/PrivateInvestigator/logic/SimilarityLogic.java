@@ -13,15 +13,15 @@ public class SimilarityLogic {
      * This method finds repeated occurrences of the same event happening at different timestamps and maps it with
      * corresponding indexes in the given list of lines. This gives us a collection of unique strings to compare.
      * This helps us reduce the number of iterations we will have to do later.
-     * @param lines the input data as a list of lines
+     * @param inputLines the input data as a list of lines
      * @return map of unique strings and corresponding indexes in the given list of lines.
      */
-    public static Map<String, List<Integer>> sameEventIndexesMap(List<String> lines) {
+    public static Map<String, List<Integer>> sameEventIndexesMap(List<String> inputLines) {
         Map<String, List<Integer>> sameEventIndexesMap = new HashMap<>();
 
-        if (lines != null) {
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
+        if (inputLines != null) {
+            for (int i = 0; i < inputLines.size(); i++) {
+                String line = inputLines.get(i);
                 String s = removeTimeStampPrefix(line);
                 List<Integer> indexes = sameEventIndexesMap.computeIfAbsent(s, k -> new ArrayList<>());
                 indexes.add(i);
@@ -112,11 +112,17 @@ public class SimilarityLogic {
         return line;
     }
 
-    public static List<String> generateOutputLines(Map<String, SimilarGroup> similarGroupMap, List<String> lines) {
+    /**
+     * iterates over the similarGroupMap and prepares the output, using lineNumbers in conjunction with inputLines, as well as changing words.
+     * @param similarGroupMap
+     * @param inputLines
+     * @return output as list of strings
+     */
+    public static List<String> generateOutputLines(Map<String, SimilarGroup> similarGroupMap, List<String> inputLines) {
         List<String> outputLines = new ArrayList<>();
-        if (similarGroupMap != null && lines != null) {
+        if (similarGroupMap != null && inputLines != null) {
             similarGroupMap.forEach((key, value) -> {
-                value.getLineNumbers().forEach(integer -> outputLines.add(lines.get(integer)));
+                value.getLineNumbers().forEach(integer -> outputLines.add(inputLines.get(integer)));
                 outputLines.add("The changing word was: " + String.join(", ", value.getChangingWords()));
             });
         }
