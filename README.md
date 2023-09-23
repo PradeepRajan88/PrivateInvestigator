@@ -40,11 +40,11 @@ If my assumption that events happen repeatedly is true, this solution scales wel
 ### Another possible optimization 
 
 If the number of unique words in the data is small (limited number of people doing limited number of things again and again), we can use a Map of word - uniqueInteger to reduce each sentence into an array of integers.
-Then the comparison algorithm becomes int comparison (i == j) rather than String comparison (iString.equals(jString)), making it faster. However, word order matters for us, so we should not sort our integer array like many standard algorithms do.
+Then the comparison algorithm becomes int comparison (intArray[i] == intArray[j]) rather than String comparison (iString.equals(jString)), making it faster. However, word order matters for us, so we should not sort our integer array like many standard algorithms do.
 
 ## If I had more time
 
-I would try to optimize further, using the aforementioned word-int Map. If we can assume that the Strings have a fixed structure (for example Name + verb + noun), that's a possibility for optimization. If we can assume that phrases like "is", "at a", "the" follow a fixed pattern, we can try to avoid comparing them unnecessarily.
+I would try to optimize further, to reduce time complexity even at the cost of Space complexity. If we can assume that the Strings have a fixed structure (for example Name + verb + noun), that's a possibility for optimization. If we can assume that phrases like "is", "at a", "the" follow a fixed pattern, we can try to avoid comparing them unnecessarily.
 
 It would be good to have unit tests for each function in the logic class.
 
